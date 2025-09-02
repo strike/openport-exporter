@@ -32,7 +32,7 @@ jobs:
       contents: write
       pull-requests: write
     env:
-      CHART_DIR: charts/openport-exporter
+      CHART_DIR: chart
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
