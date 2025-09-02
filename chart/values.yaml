@@ -1,18 +1,14 @@
 fullnameOverride: "openport-exporter"
-
 # The container image to deploy
 image:
   repository: ghcr.io/renatogalera/openport-exporter
-  tag: ${VERSION}
+  tag: v0.2.0
   pullPolicy: "IfNotPresent"
-
 # Replica count for the Deployment
 replicaCount: 1
-
 deployment:
   annotations: {}
   labels: {}
-
 # Pod disruption budget settings
 podDisruptionBudget:
   annotations: {}
@@ -20,44 +16,41 @@ podDisruptionBudget:
   enabled: false
   minAvailable: 1
   maxUnavailable: ""
-
 # Kubernetes service account
 serviceAccount:
   create: true
   name: ""
-
 # Add environment variables that the container should use
 extraEnv: []
-  # - name: EXAMPLE_ENV
-  #   value: "someValue"
-
+# - name: EXAMPLE_ENV
+#   value: "someValue"
 
 # Optional extra args passed to the exporter
 extraArgs: []
-  # Exporter flags (examples — uncomment as needed):
-  # - --log.level=info                 # debug|info|warn|error
-  # - --log.format=json                # text|json
-  # - --metrics.path=/metrics
-  # - --listen.port=9919
-  # - --address=localhost
-  # - --config.path=/app/config.yaml
-  # - --collector.go                   # enable Go runtime metrics
-  # - --collector.build_info=false     # disable build_info collector
-  # Prober endpoint (opt-in, disabled by default):
-  # - --prober.enable
-  # - --prober.allow_cidr=192.168.0.0/16       # repeatable
-  # - --prober.allow_cidr=10.0.0.0/8           # repeatable
-  # - --prober.client_allow_cidr=10.0.0.0/8    # repeatable (client IPs)
-  # - --prober.rate_limit=1
-  # - --prober.burst=1
-  # - --prober.max_cidr_size=24
-  # - --prober.max_concurrent=1
-  # - --prober.max_ports=4096
-  # - --prober.max_targets=32
-  # - --prober.default_timeout=10s
-  # - --prober.auth_token=changeme
-  # - --prober.basic_user=user
-  # - --prober.basic_pass=pass
+# Exporter flags (examples — uncomment as needed):
+# - --log.level=info                 # debug|info|warn|error
+# - --log.format=json                # text|json
+# - --metrics.path=/metrics
+# - --listen.port=9919
+# - --address=localhost
+# - --config.path=/app/config.yaml
+# - --collector.go                   # enable Go runtime metrics
+# - --collector.build_info=false     # disable build_info collector
+# Prober endpoint (opt-in, disabled by default):
+# - --prober.enable
+# - --prober.allow_cidr=192.168.0.0/16       # repeatable
+# - --prober.allow_cidr=10.0.0.0/8           # repeatable
+# - --prober.client_allow_cidr=10.0.0.0/8    # repeatable (client IPs)
+# - --prober.rate_limit=1
+# - --prober.burst=1
+# - --prober.max_cidr_size=24
+# - --prober.max_concurrent=1
+# - --prober.max_ports=4096
+# - --prober.max_targets=32
+# - --prober.default_timeout=10s
+# - --prober.auth_token=changeme
+# - --prober.basic_user=user
+# - --prober.basic_pass=pass
 
 # Resource requests and limits
 resources:
@@ -67,26 +60,24 @@ resources:
   limits:
     memory: "512Mi"
     cpu: "500m"
-
 # Node scheduling
 nodeSelector: {}
 tolerations: []
 affinity: {}
-
 # SecurityContext at the Pod level
 podSecurityContext: {}
-  # Example:
-  # runAsUser: 1000
-  # fsGroup: 2000
+# Example:
+# runAsUser: 1000
+# fsGroup: 2000
 
 # Container SecurityContext
 containerSecurityContext: {}
-  # Example:
-  # privileged: true
-  # capabilities:
-  #   add:
-  #     - NET_ADMIN
-  #     - NET_RAW
+# Example:
+# privileged: true
+# capabilities:
+#   add:
+#     - NET_ADMIN
+#     - NET_RAW
 
 # Readiness and Liveness probes configuration
 readinessProbe:
@@ -96,7 +87,6 @@ readinessProbe:
   periodSeconds: 10
   timeoutSeconds: 3
   failureThreshold: 3
-
 livenessProbe:
   enabled: true
   path: "/-/healthy"
@@ -104,7 +94,6 @@ livenessProbe:
   periodSeconds: 10
   timeoutSeconds: 3
   failureThreshold: 3
-
 # Ingress configuration
 ingress:
   enabled: false
@@ -117,13 +106,11 @@ ingress:
   #   - hosts:
   #     - "openport.example.com"
   #     secretName: "openport-tls-cert"
-
 # Service configuration
 service:
   type: ClusterIP
   port: 9919
   annotations: {}
-
 # Prometheus ServiceMonitor configuration
 serviceMonitor:
   enabled: false
@@ -132,12 +119,10 @@ serviceMonitor:
   labels: {}
   annotations: {}
   namespace: ""
-
 # Additional labels and annotations for the ConfigMap (optional)
 configMap:
   labels: {}
   annotations: {}
-
 # Config file data mapped to config.yaml
 config:
   server:
@@ -197,8 +182,8 @@ config:
   # Prober configuration (YAML; prefer this over extraArgs)
   prober:
     enabled: false
-    allow_cidrs: []             # e.g., ["10.0.0.0/8", "192.168.0.0/16"]
-    client_allow_cidrs: []      # who can call /probe (client IPs)
+    allow_cidrs: [] # e.g., ["10.0.0.0/8", "192.168.0.0/16"]
+    client_allow_cidrs: [] # who can call /probe (client IPs)
     rate_limit: 1
     burst: 1
     max_cidr_size: 24
@@ -209,7 +194,6 @@ config:
     auth_token: ""
     basic_user: ""
     basic_pass: ""
-
     # Prober modules (optional presets)
     modules:
       tcp_syn_fast:
