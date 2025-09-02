@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM golang:1.24-bookworm AS builder
+FROM golang:1.25-bookworm AS builder
 ARG VERSION=""
 ARG REVISION=""
 ARG BRANCH=""
