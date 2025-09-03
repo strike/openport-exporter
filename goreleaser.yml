@@ -34,11 +34,9 @@ nfpms:
     vendor: "OpenPort"
     section: default
     priority: extra
-    binds: []
-    suggests: []
     recommends:
       - nmap
-    depends:
+    dependencies:
       - nmap
     builds:
       - main

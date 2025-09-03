@@ -1,8 +1,6 @@
 name: Bump Chart Values on Tag
 
 on:
-  push:
-    tags: ["v*"]
   workflow_dispatch:
 
 concurrency:
@@ -32,7 +30,7 @@ jobs:
       contents: write
       pull-requests: write
     env:
-      CHART_DIR: charts/openport-exporter
+      CHART_DIR: chart
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -58,18 +56,21 @@ jobs:
           yq -i '.appVersion = env(VERSION)' "$CHART_DIR/Chart.yaml"
           echo "Updated image.tag and appVersion to ${VERSION}"
 
-      - name: Raise pull request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore(chart): bump image.tag & appVersion to ${{ steps.vars.outputs.version }} [skip ci]"
-          branch: "chore/bump-chart-to-${{ steps.vars.outputs.version }}"
-          title: "chore(chart): bump image.tag & appVersion to ${{ steps.vars.outputs.version }}"
-          body: |
-            Bumps Helm chart values to `${{ steps.vars.outputs.version }}`:
-            - `values.yaml: image.tag`
-            - `Chart.yaml: appVersion`
-
-            Triggered by tag `${{ steps.vars.outputs.version }}`.
-          labels: chart, automation, release
-          base: main
+      - name: Commit and push bump branch (open PR manually)
+        env:
+          VERSION: ${{ steps.vars.outputs.version }}
+          CHART_DIR: ${{ env.CHART_DIR }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BR="chore/bump-chart-to-${VERSION}"
+          git checkout -b "$BR"
+          git add "$CHART_DIR/values.yaml" "$CHART_DIR/Chart.yaml"
+          if git diff --cached --quiet; then
+            echo "No chart changes to commit. Skipping push."
+          else
+            git commit -m "chore(chart): bump image.tag & appVersion to ${VERSION} [skip ci]"
+            git push -u origin "$BR"
+            echo "::notice title=Open PR::https://github.com/${GITHUB_REPOSITORY}/compare/main...${BR}?expand=1"
+          fi

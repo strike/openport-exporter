@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  CHART_DIR: charts/openport-exporter
+  CHART_DIR: chart
 
 jobs:
   release:
