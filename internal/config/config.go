@@ -10,11 +10,11 @@ import (
 
 // Config holds the configuration settings.
 type Config struct {
-    Server   ServerConfig   `yaml:"server"`
-    Scanning ScanningConfig `yaml:"scanning"`
-    Auth     *AuthConfig    `yaml:"auth"`
-    Targets  []string       `yaml:"targets"`
-    Prober   *ProberConfig  `yaml:"prober,omitempty"`
+	Server   ServerConfig   `yaml:"server"`
+	Scanning ScanningConfig `yaml:"scanning"`
+	Auth     *AuthConfig    `yaml:"auth"`
+	Targets  []string       `yaml:"targets"`
+	Prober   *ProberConfig  `yaml:"prober,omitempty"`
 }
 
 // ServerConfig holds server-related configurations.
@@ -24,16 +24,16 @@ type ServerConfig struct {
 
 // ScanningConfig holds scanning-related configurations.
 type ScanningConfig struct {
-    Interval             int    `yaml:"interval"`
-    PortRange            string `yaml:"port_range"`
-    MaxCIDRSize          int    `yaml:"max_cidr_size"`
-    Timeout              int    `yaml:"timeout"`
-    DurationMetrics      bool   `yaml:"duration_metrics"`
-    DisableDNSResolution bool   `yaml:"disable_dns_resolution"`
-    UDPScan              bool   `yaml:"udp_scan"`
-    // Controls TCP scan mode: when true (default), use SYN scan (requires CAP_NET_RAW);
-    // when false, use TCP connect() scan (no special capability required).
-    UseSYNScan           *bool  `yaml:"use_syn_scan"`
+	Interval             int    `yaml:"interval"`
+	PortRange            string `yaml:"port_range"`
+	MaxCIDRSize          int    `yaml:"max_cidr_size"`
+	Timeout              int    `yaml:"timeout"`
+	DurationMetrics      bool   `yaml:"duration_metrics"`
+	DisableDNSResolution bool   `yaml:"disable_dns_resolution"`
+	UDPScan              bool   `yaml:"udp_scan"`
+	// Controls TCP scan mode: when true (default), use SYN scan (requires CAP_NET_RAW);
+	// when false, use TCP connect() scan (no special capability required).
+	UseSYNScan *bool `yaml:"use_syn_scan"`
 
 	// Nmap Performance Tuning Options
 	RateLimit            int  `yaml:"rate_limit"`
@@ -58,55 +58,54 @@ type AuthConfig struct {
 
 // BasicAuthConfig holds basic authentication credentials.
 type BasicAuthConfig struct {
-    Username string `yaml:"username"`
-    Password string `yaml:"password"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
 }
 
 // Prober configuration for /probe presets (modules)
 type ProberConfig struct {
-    // Enable /probe endpoint
-    Enabled bool `yaml:"enabled"`
-    // Target allowlist (CIDRs allowed to be scanned)
-    AllowCIDRs []string `yaml:"allow_cidrs"`
-    // Client IP allowlist (CIDRs allowed to call /probe)
-    ClientAllowCIDRs []string `yaml:"client_allow_cidrs"`
-    // Rate limiting
-    RateLimit float64 `yaml:"rate_limit"`
-    Burst int `yaml:"burst"`
-    // Max CIDR split and concurrency
-    MaxCIDRSize int `yaml:"max_cidr_size"`
-    MaxConcurrent int `yaml:"max_concurrent"`
-    // Default timeout string, e.g., "10s"
-    DefaultTimeout string `yaml:"default_timeout"`
-    // Safety limits
-    MaxPorts int `yaml:"max_ports"`
-    MaxTargets int `yaml:"max_targets"`
-    // Optional auth
-    AuthToken string `yaml:"auth_token"`
-    BasicUser string `yaml:"basic_user"`
-    BasicPass string `yaml:"basic_pass"`
+	// Enable /probe endpoint
+	Enabled bool `yaml:"enabled"`
+	// Target allowlist (CIDRs allowed to be scanned)
+	AllowCIDRs []string `yaml:"allow_cidrs"`
+	// Client IP allowlist (CIDRs allowed to call /probe)
+	ClientAllowCIDRs []string `yaml:"client_allow_cidrs"`
+	// Rate limiting
+	RateLimit float64 `yaml:"rate_limit"`
+	Burst     int     `yaml:"burst"`
+	// Max CIDR split and concurrency
+	MaxCIDRSize   int `yaml:"max_cidr_size"`
+	MaxConcurrent int `yaml:"max_concurrent"`
+	// Default timeout string, e.g., "10s"
+	DefaultTimeout string `yaml:"default_timeout"`
+	// Safety limits
+	MaxPorts   int `yaml:"max_ports"`
+	MaxTargets int `yaml:"max_targets"`
+	// Optional auth
+	AuthToken string `yaml:"auth_token"`
+	BasicUser string `yaml:"basic_user"`
+	BasicPass string `yaml:"basic_pass"`
 
-    Modules map[string]ProberModule `yaml:"modules"`
+	Modules map[string]ProberModule `yaml:"modules"`
 }
 
 // ProberModule defines a preset of scanning tunings and defaults for /probe
 type ProberModule struct {
-    Protocol             *string `yaml:"protocol"`
-    Ports                *string `yaml:"ports"`
-    UseSYNScan           *bool   `yaml:"use_syn_scan"`
-    MinRate              *int    `yaml:"min_rate"`
-    MaxRate              *int    `yaml:"max_rate"`
-    MinParallelism       *int    `yaml:"min_parallelism"`
-    MaxRetries           *int    `yaml:"max_retries"`
-    HostTimeout          *int    `yaml:"host_timeout"`
-    ScanDelay            *int    `yaml:"scan_delay"`
-    MaxScanDelay         *int    `yaml:"max_scan_delay"`
-    InitialRttTimeout    *int    `yaml:"initial_rtt_timeout"`
-    MaxRttTimeout        *int    `yaml:"max_rtt_timeout"`
-    MinRttTimeout        *int    `yaml:"min_rtt_timeout"`
-    DisableHostDiscovery *bool   `yaml:"disable_host_discovery"`
+	Protocol             *string `yaml:"protocol"`
+	Ports                *string `yaml:"ports"`
+	UseSYNScan           *bool   `yaml:"use_syn_scan"`
+	MinRate              *int    `yaml:"min_rate"`
+	MaxRate              *int    `yaml:"max_rate"`
+	MinParallelism       *int    `yaml:"min_parallelism"`
+	MaxRetries           *int    `yaml:"max_retries"`
+	HostTimeout          *int    `yaml:"host_timeout"`
+	ScanDelay            *int    `yaml:"scan_delay"`
+	MaxScanDelay         *int    `yaml:"max_scan_delay"`
+	InitialRttTimeout    *int    `yaml:"initial_rtt_timeout"`
+	MaxRttTimeout        *int    `yaml:"max_rtt_timeout"`
+	MinRttTimeout        *int    `yaml:"min_rtt_timeout"`
+	DisableHostDiscovery *bool   `yaml:"disable_host_discovery"`
 }
-
 
 // Default constants for fallback values.
 const (
@@ -128,7 +127,7 @@ const (
 	DefaultInitialRttTimeout    = 0
 	DefaultMaxRttTimeout        = 0
 	DefaultMinRttTimeout        = 0
-    DefaultDisableHostDiscovery = true // Default to Pn for faster scanning in known environments
+	DefaultDisableHostDiscovery = true // Default to Pn for faster scanning in known environments
 )
 
 // LoadConfig loads the configuration from a YAML file.
@@ -195,25 +194,25 @@ func LoadConfig(filename string) (*Config, error) {
 	if cfg.Scanning.MinRttTimeout < 0 {
 		cfg.Scanning.MinRttTimeout = DefaultMinRttTimeout
 	}
-    // Default for DisableHostDiscovery is already set in constant
-    // Default UseSYNScan to true if not explicitly set
-    if cfg.Scanning.UseSYNScan == nil {
-        t := true
-        cfg.Scanning.UseSYNScan = &t
-    }
+	// Default for DisableHostDiscovery is already set in constant
+	// Default UseSYNScan to true if not explicitly set
+	if cfg.Scanning.UseSYNScan == nil {
+		t := true
+		cfg.Scanning.UseSYNScan = &t
+	}
 
-    return &cfg, nil
+	return &cfg, nil
 }
 
 // GetScanIntervalDuration returns the scan interval as a time.Duration.
 func (c *Config) GetScanIntervalDuration() time.Duration {
-    return time.Duration(c.Scanning.Interval) * time.Second
+	return time.Duration(c.Scanning.Interval) * time.Second
 }
 
 // UseSYNScanEnabled returns the effective value of UseSYNScan (default true when unset).
 func (c *Config) UseSYNScanEnabled() bool {
-    if c.Scanning.UseSYNScan == nil {
-        return true
-    }
-    return *c.Scanning.UseSYNScan
+	if c.Scanning.UseSYNScan == nil {
+		return true
+	}
+	return *c.Scanning.UseSYNScan
 }

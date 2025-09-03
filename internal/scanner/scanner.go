@@ -1,15 +1,15 @@
 package scanner
 
 import (
-    "context"
-    "encoding/binary"
-    "fmt"
-    "log/slog"
-    "math/big"
-    "net"
-    "strconv"
-    "strings"
-    "time"
+	"context"
+	"encoding/binary"
+	"fmt"
+	"log/slog"
+	"math/big"
+	"net"
+	"strconv"
+	"strings"
+	"time"
 
 	cfgpkg "github.com/renatogalera/openport-exporter/internal/config"
 	metricspkg "github.com/renatogalera/openport-exporter/internal/metrics"
@@ -54,34 +54,34 @@ func StartWorkers(ctx context.Context, workerCount int, taskQueue chan ScanTask,
 }
 
 func worker(ctx context.Context, taskQueue chan ScanTask, cfg *cfgpkg.Config, semaphore chan struct{}, metricsCollector *metricspkg.MetricsCollector, log *slog.Logger) {
-    for task := range taskQueue {
-        select {
-        case <-ctx.Done():
-            return
-        default:
-        }
-        // Acquire semaphore token to bound concurrency
-        semaphore <- struct{}{}
+	for task := range taskQueue {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
+		// Acquire semaphore token to bound concurrency
+		semaphore <- struct{}{}
 
-        // Run the scan synchronously in this goroutine
-        log.Debug("Worker picked up a task", "target", task.Target, "portRange", task.PortRange, "protocol", task.Protocol)
-        func() {
-            defer func() {
-                if r := recover(); r != nil {
-                    log.Error("Recovered from panic", "task", task, "panic", r)
-                }
-            }()
-            scanCtx, cancel := context.WithTimeout(ctx, time.Duration(cfg.Scanning.Timeout)*time.Second)
-            defer cancel()
-            if err := scanTarget(scanCtx, task, cfg, metricsCollector, log); err != nil {
-                log.Error("Scan failed", "target", task.Target, "portRange", task.PortRange, "protocol", task.Protocol, "error", err)
-            }
-        }()
+		// Run the scan synchronously in this goroutine
+		log.Debug("Worker picked up a task", "target", task.Target, "portRange", task.PortRange, "protocol", task.Protocol)
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					log.Error("Recovered from panic", "task", task, "panic", r)
+				}
+			}()
+			scanCtx, cancel := context.WithTimeout(ctx, time.Duration(cfg.Scanning.Timeout)*time.Second)
+			defer cancel()
+			if err := scanTarget(scanCtx, task, cfg, metricsCollector, log); err != nil {
+				log.Error("Scan failed", "target", task.Target, "portRange", task.PortRange, "protocol", task.Protocol, "error", err)
+			}
+		}()
 
-        metricsCollector.UpdateTaskQueueSize(len(taskQueue))
-        // Release semaphore token
-        <-semaphore
-    }
+		metricsCollector.UpdateTaskQueueSize(len(taskQueue))
+		// Release semaphore token
+		<-semaphore
+	}
 }
 
 func scanTarget(ctx context.Context, task ScanTask, cfg *cfgpkg.Config, metricsCollector *metricspkg.MetricsCollector, log *slog.Logger) error {
@@ -194,16 +194,16 @@ func createNmapScanner(task ScanTask, cfg *cfgpkg.Config, ctx context.Context) (
 		nmap.WithTargets(task.Target),
 		nmap.WithPorts(task.PortRange),
 	}
-    // Exclusive protocol selection
-    if cfg.Scanning.UDPScan || strings.ToLower(task.Protocol) == "udp" {
-        scannerOptions = append(scannerOptions, nmap.WithUDPScan())
-    } else {
-        if cfg.UseSYNScanEnabled() {
-            scannerOptions = append(scannerOptions, nmap.WithSYNScan())
-        } else {
-            scannerOptions = append(scannerOptions, nmap.WithConnectScan())
-        }
-    }
+	// Exclusive protocol selection
+	if cfg.Scanning.UDPScan || strings.ToLower(task.Protocol) == "udp" {
+		scannerOptions = append(scannerOptions, nmap.WithUDPScan())
+	} else {
+		if cfg.UseSYNScanEnabled() {
+			scannerOptions = append(scannerOptions, nmap.WithSYNScan())
+		} else {
+			scannerOptions = append(scannerOptions, nmap.WithConnectScan())
+		}
+	}
 
 	// Tunables
 	if cfg.Scanning.MinRate > 0 {
@@ -285,16 +285,16 @@ func processNmapResults(result *nmap.Run, task ScanTask, log *slog.Logger) (map[
 			hostsDown++
 		}
 		if len(host.Ports) > 0 && len(host.Addresses) > 0 {
-            for _, port := range host.Ports {
-                if port.State.State == "open" {
-                    // Store as "ip:port/proto" using JoinHostPort to handle IPv6 correctly
-                    ipStr := host.Addresses[0].String()
-                    hostPort := net.JoinHostPort(ipStr, strconv.Itoa(int(port.ID)))
-                    portKey := fmt.Sprintf("%s/%s", hostPort, strings.ToLower(task.Protocol))
-                    newResults[portKey] = struct{}{}
-                    log.Debug("Open port found", "ip", ipStr, "port", port.ID, "protocol", task.Protocol)
-                }
-            }
+			for _, port := range host.Ports {
+				if port.State.State == "open" {
+					// Store as "ip:port/proto" using JoinHostPort to handle IPv6 correctly
+					ipStr := host.Addresses[0].String()
+					hostPort := net.JoinHostPort(ipStr, strconv.Itoa(int(port.ID)))
+					portKey := fmt.Sprintf("%s/%s", hostPort, strings.ToLower(task.Protocol))
+					newResults[portKey] = struct{}{}
+					log.Debug("Open port found", "ip", ipStr, "port", port.ID, "protocol", task.Protocol)
+				}
+			}
 		}
 	}
 	return newResults, hostsUp, hostsDown

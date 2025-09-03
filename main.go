@@ -1,12 +1,12 @@
 package main
 
 import (
-    "log"
-    "github.com/renatogalera/openport-exporter/cmd"
+	"github.com/renatogalera/openport-exporter/cmd"
+	"log"
 )
 
 func main() {
-    if err := cmd.Execute(); err != nil {
-        log.Fatal(err)
-    }
+	if err := cmd.Execute(); err != nil {
+		log.Fatal(err)
+	}
 }

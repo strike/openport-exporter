@@ -227,6 +227,7 @@ func TestCategorizeError(t *testing.T) {
 }
 
 type errf string
+
 func (e errf) Error() string { return string(e) }
 
 // --- createNmapScanner sanity (does not run nmap) ---

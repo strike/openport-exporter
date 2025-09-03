@@ -88,27 +88,27 @@ func baseConfig() *cfgpkg.Config {
 
 func baseSettingsWithProber() *collectors.Settings {
 	return &collectors.Settings{
-		LogLevel:                "error",
-		LogFormat:               "text",
-		MetricsPath:             "/metrics",
-		ListenPort:              "0", // ignored because we use srv.Serve(ln)
-		Address:                 "localhost",
-		ConfigPath:              "",
-		EnableGoCollector:       false,
-		EnableBuildInfo:         true,
-		EnableProber:            true,
-		ProberAllowCIDRs:        []string{"127.0.0.0/8"}, // allow localhost targets by default
-		ProberClientAllowCIDRs:  []string{"127.0.0.0/8"}, // only localhost may call /probe
-		ProberRateLimit:         1000,                    // effectively no limit for most tests
-		ProberBurst:             1000,
-		ProberMaxCIDRSize:       24,
-		ProberMaxConcurrent:     8,
-		ProberDefaultTimeout:    "1s",
-		ProberMaxPorts:          1024,
-		ProberMaxTargets:        32,
-		ProberAuthToken:         "",
-		ProberBasicUser:         "",
-		ProberBasicPass:         "",
+		LogLevel:               "error",
+		LogFormat:              "text",
+		MetricsPath:            "/metrics",
+		ListenPort:             "0", // ignored because we use srv.Serve(ln)
+		Address:                "localhost",
+		ConfigPath:             "",
+		EnableGoCollector:      false,
+		EnableBuildInfo:        true,
+		EnableProber:           true,
+		ProberAllowCIDRs:       []string{"127.0.0.0/8"}, // allow localhost targets by default
+		ProberClientAllowCIDRs: []string{"127.0.0.0/8"}, // only localhost may call /probe
+		ProberRateLimit:        1000,                    // effectively no limit for most tests
+		ProberBurst:            1000,
+		ProberMaxCIDRSize:      24,
+		ProberMaxConcurrent:    8,
+		ProberDefaultTimeout:   "1s",
+		ProberMaxPorts:         1024,
+		ProberMaxTargets:       32,
+		ProberAuthToken:        "",
+		ProberBasicUser:        "",
+		ProberBasicPass:        "",
 	}
 }
 

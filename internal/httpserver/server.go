@@ -40,11 +40,11 @@ var portsRe = regexp.MustCompile(`^(?:\d{1,5}(?:-\d{1,5})?)(?:\s*,\s*(?:\d{1,5}(
 // NewServer wires the custom registry and handlers.
 //
 // Security/perf hardening in this version:
-//  - Correct promhttp usage (no bogus HandlerOpts fields).
-//  - Add MaxRequestsInFlight/Timeout to metrics handler for backpressure.
-//  - Optional /probe auth accepts either Bearer OR Basic when both configured.
-//  - Optional use of X-Forwarded-For only when coming from loopback.
-//  - Soft readiness gating via an internal flag setter (exported via SetReady).
+//   - Correct promhttp usage (no bogus HandlerOpts fields).
+//   - Add MaxRequestsInFlight/Timeout to metrics handler for backpressure.
+//   - Optional /probe auth accepts either Bearer OR Basic when both configured.
+//   - Optional use of X-Forwarded-For only when coming from loopback.
+//   - Soft readiness gating via an internal flag setter (exported via SetReady).
 func NewServer(e *collectors.Exporter, s *collectors.Settings, cfg *cfgpkg.Config) *http.Server {
 	t := template.Must(template.New("root").Parse(rootTemplate))
 
