@@ -144,9 +144,9 @@ func LoadConfig(filename string) (*Config, error) {
 	if cfg.Server.Port < 0 || cfg.Server.Port > 65535 {
 		return nil, fmt.Errorf("invalid server port: %d", cfg.Server.Port)
 	}
-	if cfg.Scanning.Interval < 600 {
-		cfg.Scanning.Interval = DefaultScanInterval
-	}
+	// if cfg.Scanning.Interval < 600 {
+	// cfg.Scanning.Interval = DefaultScanInterval
+	// }
 	if cfg.Scanning.Timeout <= 0 {
 		cfg.Scanning.Timeout = DefaultScanTimeout
 	}

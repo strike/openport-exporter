@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"context"
+	"net"
 	"strings"
 	"sync"
 	"time"
@@ -28,6 +29,9 @@ type MetricsCollector struct {
 	lastScanTimestamp     *prometheus.GaugeVec
 	portStateChanges      *prometheus.CounterVec
 	scanDurationHistogram *prometheus.HistogramVec
+
+	// New detailed port status metric with corrected labels
+	targetPortOpen *prometheus.GaugeVec
 }
 
 // NewMetricsCollector creates and initializes a new MetricsCollector.
@@ -119,9 +123,18 @@ func NewMetricsCollector() *MetricsCollector {
 				Namespace: metricNamespace,
 				Name:      "scan_duration_seconds",
 				Help:      "Histogram of scan durations in seconds.",
-				Buckets:   prometheus.DefBuckets,
+				Buckets:   []float64{1, 2, 5, 10, 20, 60, 120, 300, 600, 900, 1800},
 			},
 			[]string{"target", "port_range", "protocol"},
+		),
+		// New detailed port status metric with corrected labels
+		targetPortOpen: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: metricNamespace,
+				Name:      "target_port_open",
+				Help:      "Whether the (ip,port,protocol) tuple was open during the last scan.",
+			},
+			[]string{"ip", "port", "protocol"},
 		),
 	}
 	return mc
@@ -147,6 +160,9 @@ func (mc *MetricsCollector) Describe(ch chan<- *prometheus.Desc) {
 	mc.lastScanTimestamp.Describe(ch)
 	mc.portStateChanges.Describe(ch)
 	mc.scanDurationHistogram.Describe(ch)
+
+	// New metric
+	mc.targetPortOpen.Describe(ch)
 }
 
 // Collect is called by the Prometheus registry when collecting metrics.
@@ -164,6 +180,9 @@ func (mc *MetricsCollector) Collect(ch chan<- prometheus.Metric) {
 	mc.lastScanTimestamp.Collect(ch)
 	mc.portStateChanges.Collect(ch)
 	mc.scanDurationHistogram.Collect(ch)
+
+	// New metric
+	mc.targetPortOpen.Collect(ch)
 }
 
 // ------------------- EXISTING METHODS -------------------
@@ -176,7 +195,25 @@ func (mc *MetricsCollector) UpdateMetrics(targetKey string, newResults map[strin
 	// Update aggregated open ports metric by target components.
 	tgt, pr, proto := parseTargetKey(targetKey)
 	mc.scanTargetOpenPortsTotal.WithLabelValues(tgt, pr, proto).Set(float64(len(newResults)))
+
+	// Clear previous port metrics for this target/protocol
+	mc.clearPreviousPortMetrics(tgt, proto, prevScanInfo.Ports)
+
+	// Set new port metrics for each open port
+	for portKey := range newResults {
+		ip, port := splitIPPort(portKey)
+		mc.targetPortOpen.WithLabelValues(ip, port, proto).Set(1)
+	}
+
 	mc.storeCurrentScanInfo(targetKey, newResults)
+}
+
+// clearPreviousPortMetrics removes metrics for ports that might no longer be open
+func (mc *MetricsCollector) clearPreviousPortMetrics(target, protocol string, prevPorts map[string]struct{}) {
+	for portKey := range prevPorts {
+		ip, port := splitIPPort(portKey)
+		mc.targetPortOpen.DeleteLabelValues(ip, port, protocol)
+	}
 }
 
 // CanScan checks if a new scan can be performed based on the scan interval.
@@ -285,6 +322,20 @@ func parseTargetKey(k string) (string, string, string) {
 	return parts[0], parts[1], parts[2]
 }
 
+// splitIPPort extracts the IP and port from the port key.
+func splitIPPort(k string) (string, string) {
+	if i := strings.LastIndexByte(k, '/'); i >= 0 {
+		k = k[:i]
+	}
+	if host, port, err := net.SplitHostPort(k); err == nil {
+		return host, port
+	}
+	if i := strings.LastIndex(k, ":"); i != -1 && i < len(k)-1 {
+		return k[:i], k[i+1:]
+	}
+	return k, ""
+}
+
 // StartSweeper starts a background eviction loop that removes stale scannedTargets
 // and cleans the aggregated metric after the provided TTL. It stops when ctx is done.
 func (mc *MetricsCollector) StartSweeper(ctx context.Context, ttl time.Duration) {
@@ -308,6 +359,12 @@ func (mc *MetricsCollector) StartSweeper(ctx context.Context, ttl time.Duration)
 						mc.scannedTargets.Delete(k)
 						tgt, pr, proto := parseTargetKey(k)
 						mc.scanTargetOpenPortsTotal.DeleteLabelValues(tgt, pr, proto)
+
+						// Clean up individual port metrics
+						for portKey := range v.Ports {
+							ip, port := splitIPPort(portKey)
+							mc.targetPortOpen.DeleteLabelValues(ip, port, proto)
+						}
 					}
 					return true
 				})
